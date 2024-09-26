@@ -6,13 +6,13 @@ public class EnemyAI : MonoBehaviour
 {
 
     private Transform currentTarget;
-    public Transform pointAttack; 
-    
+    public Transform pointAttack;
+
     public float moveSpeed = 0.25f;
-    public float waitTime = 1f; 
-    public float attackRadius = 1f; 
-    public float requiredDistance = 5f; 
-    public float attackRate = 1f; 
+    public float waitTime = 1f;
+    public float attackRadius = 1f;
+    public float requiredDistance = 5f;
+    public float attackRate = 1f;
     public int attackDamage = 10;
 
     private Rigidbody2D rb;
@@ -101,21 +101,21 @@ public class EnemyAI : MonoBehaviour
     private IEnumerator PerformAttack()
     {
         isAttackOnCooldown = true;
-        
+
 
         animator.SetTrigger("Attack");
 
-    
-        yield return new WaitForSeconds(0.5f); 
-                
-    
+
+        yield return new WaitForSeconds(0.5f);
+
+
         if (player != null && Vector2.Distance(pointAttack.position, player.transform.position) <= attackRadius)
         {
-        
+
             player.GetComponent<Player>().TakeDamage(gameObject, attackDamage);
         }
 
-    
+
         yield return new WaitForSeconds(attackRate);
         isAttackOnCooldown = false;
     }

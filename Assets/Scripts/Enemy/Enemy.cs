@@ -9,10 +9,7 @@ public class Enemy : MonoBehaviour, ICanTakeDamage
     [SerializeField]public int MaxHealth  = 50;
     public int CurrentHealth { get; private set; }
     public static Enemy Instance { get; private set; }
-    private bool isDead=false;
     
-
-
     void Start()
     {
         CurrentHealth = MaxHealth;
@@ -50,9 +47,7 @@ public class Enemy : MonoBehaviour, ICanTakeDamage
     void Die()
     {
         Debug.Log("Enemy died.");
-        isDead=true;
         anim.SetTrigger(isDeadId);
-        
     }
     IEnumerator WaitFor1SecondBeforeDelete()
     {

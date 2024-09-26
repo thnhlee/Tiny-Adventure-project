@@ -13,22 +13,30 @@ public interface ICanTakeDamage
 
 public class Player : MonoBehaviour, ICanTakeDamage
 {
-    public int MaxHealth { get; private set; } = 100;
+    public int MaxHealth { get; private set; } = 10;
     public int CurrentHealth { get; private set; }
     private Animator anim;
     private int isDeadId;
-     private PlayerControl playerController;
-     private PlayerAttack playerAttack;
+    private PlayerControl playerController;
+    private PlayerAttack playerAttack;
+    public event Action OnPlayerDeath;
 
-  
     void Start()
     {
+
+        InitializePlayer();
+    }
+    private void InitializePlayer()
+    {
         CurrentHealth = MaxHealth;
-        anim=GetComponentInChildren<Animator>();
-        isDeadId=Animator.StringToHash("isDead");
+        anim = GetComponentInChildren<Animator>();
+        isDeadId = Animator.StringToHash("isDead");
+        playerController = GetComponent<PlayerControl>();
+        playerAttack = GetComponent<PlayerAttack>();
         if (PlayerHealth.Instance != null)
         {
             PlayerHealth.Instance.SetMaxHealth(MaxHealth);
+            PlayerHealth.Instance.SetHealth(CurrentHealth);
         }
         else
         {
@@ -36,17 +44,17 @@ public class Player : MonoBehaviour, ICanTakeDamage
         }
     }
 
-    
+
     public void TakeDamage(GameObject source, int amount)
     {
         if (amount < 0)
             throw new ArgumentException("Damage amount cannot be negative.");
 
         CurrentHealth -= amount;
-        if (CurrentHealth < 0) 
-           { CurrentHealth = 0;
+        if (CurrentHealth <= 0)
+        {
             Dead();
-           }
+        }
         if (PlayerHealth.Instance != null)
         {
             PlayerHealth.Instance.SetHealth(CurrentHealth);
@@ -56,22 +64,18 @@ public class Player : MonoBehaviour, ICanTakeDamage
             Debug.LogError("PlayerHealth instance is not set.");
         }
 
-        
+
     }
     private void Dead()
     {
         anim.SetTrigger(isDeadId);
-        if (playerController != null||playerAttack!=null)
+        if (playerController != null || playerAttack != null)
         {
             playerController.enabled = false;
-            playerAttack.enabled=false;     
+            playerAttack.enabled = false;
         }
+        OnPlayerDeath?.Invoke();
 
-        StartCoroutine(DestroyAfterDelay(1f));
     }
-      private IEnumerator DestroyAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay); 
-        Destroy(gameObject); 
-    }
+
 }
